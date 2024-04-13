@@ -1,0 +1,9 @@
+AAA       START
+          LD      GR0, ABC
+          ADDA    GR0, BBB
+          ST      GR0, ANS
+          RET
+ABC       DC      1
+BBB       DC      2
+ANS       DS      1
+          END
