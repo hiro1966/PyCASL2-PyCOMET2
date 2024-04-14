@@ -185,7 +185,7 @@ class CASL2:
             self.message = message
 
         def report(self):
-            print >> sys.stderr, "Error: %s\nLine %d: %s" % (self.message, self.line_num, self.src)
+            print("Error: %s\nLine %d: %s" % (self.message, self.line_num, self.src), file=sys.stderr)
 
 
     def __init__(self, filename=""):
@@ -227,8 +227,7 @@ class CASL2:
         self.filename = filename
         self.addr = 0
 
-        #self.fp = file(filename, 'r')
-        self.fp = open(filename, 'r')
+        self.fp = open(filename, 'r', encoding="utf-8")
         self.current_line_number = -1
         self.next_line = self.Instruction(None, "", None, -1, "")
         self.next_src = ""
@@ -241,9 +240,6 @@ class CASL2:
             e.report()
             sys.exit()
         except Exception as e:
-            #print >> sys.stderr, "Error: Unexpected error at the following line.\nLine %d: %s" % (self.current_line_number, self.current_src)
-            #print >> sys.stderr, "Exception type:", str(type(e))
-            #print >> sys.stderr, str(e)
             print("Error: Unexpected error at the following line.\nLine %d: %s" % (self.current_line_number, self.current_src), file=sys.stderr)
             print("Exception type:", str(type(e)), file=sys.stderr)
             print(str(e), file=sys.stderr)
@@ -261,9 +257,9 @@ class CASL2:
             e.report()
             sys.exit()
         except Exception as  e:
-            print >> sys.stderr, "Error: Unexpected error."
-            print >> sys.stderr, "Exception type:", str(type(e))
-            print >> sys.stderr, str(e)
+            print ("Error: Unexpected error.",file=sys.stderr)    
+            print ("Exception type:", str(type(e)),file=sys.stderr)
+            print (sys.stderr, str(e),file=sys.stderr)
             sys.exit()
 
         # =記法のリテラル用コードを末尾に加える。
@@ -315,6 +311,7 @@ class CASL2:
 
         while True:
             line = self.fp.readline().rstrip()
+            #print(line)
             self.current_line_number += 1
             self.next_src = line
 
@@ -433,11 +430,11 @@ class CASL2:
         result = re.match(pattern, line)
 
         if result == None:
-            print >> sys.stderr, 'Line %d: Invalid line was found.' % line_number
-            print >> sys.stderr,  line
+            print ('Line %d: Invalid line was found.' % line_number,file=sys.stderr)
+            print (  line,file=sys.stderr)
             sys.exit()
 
-##        print result.group('label'), result.group('op'), result.group('arg1'), result.group('arg2'), result.group('arg3')
+        #print(result.group('label'), result.group('op'), result.group('arg1'), result.group('arg2'), result.group('arg3'), result.group('comment'))
         label = result.group('label')
         op = result.group('op')
         args = None
@@ -455,7 +452,7 @@ class CASL2:
         if inst.label != None:
             label_name = self.current_scope + '.' + inst.label
             if label_name in self.symbols.keys():
-                print >> sys.stderr, 'Line %d: Label "%s" is already defined.' % (inst.line_number, inst.label)
+                print ( 'Line %d: Label "%s" is already defined.' % (inst.line_number, inst.label), file=sys.stderr)
                 sys.exit()
             #
             self.symbols[label_name] = self.Label(label_name, inst.line_number, self.filename, self.addr)
@@ -598,7 +595,7 @@ class CASL2:
             #
             if op_table[inst.op][0] == -100:
                 if inst.label == None:
-                    print >> sys.stderr, 'Line %d: Label should be defined for START.' % inst.line_number
+                    print( 'Line %d: Label should be defined for START.' % inst.line_number, file=sys.stderr)
                     sys.exit()
                 self.current_scope = inst.label
                 if self.start_found:
@@ -620,7 +617,7 @@ class CASL2:
 
             return bcode
         except KeyError:
-            print >> sys.stderr, 'Line %d: Invalid instruction "%s" was found.' % (inst.line_number, inst.op)
+            print ('Line %d: Invalid instruction "%s" was found.' % (inst.line_number, inst.op),file=sys.stderr)
             sys.exit()
 
     def is_arg_register(self, arg):
