@@ -969,7 +969,7 @@ class pyComet2:
         if not quiet:
             print ('done.',file=sys.stderr)    
 
-    def dump_memory(self, start_addr = 0x0000, lines = 0xffff / 8):
+    def dump_memory(self, start_addr = 0x0000, lines: int = 0xffff / 8):
         def to_char(array):
             def chr2(i):
                 c = 0x00ff & i
@@ -998,7 +998,7 @@ class pyComet2:
     def dump_stack(self):
         print(self.dump_memory(self.getSP(), 16)),
 
-    def dump_to_file(self, filename, lines = 0xffff / 8):
+    def dump_to_file(self, filename, lines: int = int(0xffff / 8)):
         fp = open(filename, 'w')
         fp.write('Step count: %d\n' % self.step_count)
         fp.write('PR: #%04x\n' % self.PR)
@@ -1009,6 +1009,7 @@ class pyComet2:
         for i in range(0, 8):
             fp.write('GR%d: #%04x\n' % (i, self.GR[i]))
         fp.write('Memory:\n')
+        print("lines=",lines)
         fp.write(self.dump_memory(0, lines))
         fp.close()
 
@@ -1077,6 +1078,7 @@ class pyComet2:
                 if 2 <= len(args):
                     self.set_break_point(self.cast_int(args[1]))
             elif line[0:2] == 'df':
+                print("DF")
                 self.dump_to_file(args[1])
                 #print >> sys.stderr, 'dump to', filename
                 print ('dump to',file= sys.stderr)
